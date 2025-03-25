@@ -83,7 +83,7 @@ SOUL_TIMER = pygame.USEREVENT + 1
 pygame.time.set_timer(SOUL_TIMER, 3000)
 
 player_speed = 5
-player_x = 150
+player_x = 15000
 player_y = 325
 
 soul_x = 650
