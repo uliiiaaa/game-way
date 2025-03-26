@@ -1,4 +1,3 @@
-
 import pygame
 
 
@@ -10,17 +9,27 @@ icon = pygame.image.load('images\\icon.png')
 pygame.display.set_icon(icon)
 
 
+
 myfont = pygame.font.Font('fonts/Bytesized-Regular.ttf',40)
 
 backg = pygame.image.load('images/backg.jpg').convert()
 
-cat_die = [
-    pygame.image.load('images/death/death1.png').convert_alpha(),
-    pygame.image.load('images/death/death2.png').convert_alpha(),
-    pygame.image.load('images/death/death3.png').convert_alpha(),
-    pygame.image.load('images/death/death4.png').convert_alpha(),
+heart_icon = pygame.image.load('images/free-icon-hearts-18745836.png').convert_alpha()
+star_icon = pygame.image.load('images/star (3).png').convert_alpha()
+
+soul_die = [
+    pygame.image.load('images/slimedie/Slime1_Death_body.png').convert_alpha(),
+    pygame.image.load('images/slimedie/Slime2_Death_body.png').convert_alpha(),
+    pygame.image.load('images/slimedie/Slime3_Death_body.png').convert_alpha(),
+    pygame.image.load('images/slimedie/Slime4_Death_body.png').convert_alpha(),
+    pygame.image.load('images/slimedie/Slime5_Death_body.png').convert_alpha(),
+    pygame.image.load('images/slimedie/Slime6_Death_body.png').convert_alpha(),
+    pygame.image.load('images/slimedie/Slime7_Death_body.png').convert_alpha(),
+    pygame.image.load('images/slimedie/Slime8_Death_body.png').convert_alpha(),
+    pygame.image.load('images/slimedie/Slime9_Death_body.png').convert_alpha(),
+    pygame.image.load('images/slimedie/Slime10_Death_body.png').convert_alpha(),
 ]
-cat_die_anim_count = 0
+soul_die_anim_count = 0
 
 soul = [
     pygame.image.load('images/slime/slime1.png').convert_alpha(),
@@ -77,15 +86,20 @@ restart_label_rect = restart_label.get_rect(topleft=(230, 200))
 bullets_left = 5
 bullet = pygame.image.load('images/star (2).png').convert_alpha()
 bullets = []
-bullet_speed = 16
+bullet_speed = 14
 
 SOUL_TIMER = pygame.USEREVENT + 1
-pygame.time.set_timer(SOUL_TIMER, 3000)
+pygame.time.set_timer(SOUL_TIMER, 3500)
 
-player_speed = 5
-player_x = 15000
+level_length = 300
+backg_speed = 4
+
+player_speed = 4
+player_x = 150
 player_y = 325
+player_lives = 3
 
+player_stars = 5
 soul_x = 650
 soul_y = 335
 
@@ -103,8 +117,19 @@ while running:
     screen.blit(backg,(backg_x + 600, 0))
 
     if gameplay:
-        if player_x >= 500:
+
+        def draw_lives():
+            for i in range(player_lives):
+                screen.blit(heart_icon, (20 + i * 40, 20))
+
+
+        def draw_stars():
+            for i in range(player_stars):
+                screen.blit(star_icon, (20 + i * 40, 60))
+        if level_length < 0:
             screen.blit(Win_label, (115, 100))
+
+
         player_rect = walk_left[0].get_rect(topleft=(player_x, player_y))
         if soul_list_in_game:
             for (i, el) in enumerate(soul_list_in_game):
@@ -114,7 +139,12 @@ while running:
                 if el.x < -10:
                     soul_list_in_game.pop(i)
 
+
                 if player_rect.colliderect(el):
+                    soul_list_in_game.pop(i)
+                    player_lives -= 1
+                if player_lives == 0:
+
                     gameplay = False
 
         keys = pygame.key.get_pressed()
@@ -132,8 +162,9 @@ while running:
 
         if keys[pygame.K_LEFT] and player_x > 40:
             player_x -= player_speed
-        elif keys[pygame.K_RIGHT] and player_x < 590:
+        elif keys[pygame.K_RIGHT] and player_x < 500:
             player_x += player_speed
+            level_length -= player_speed
 
         if not is_jump:
             if keys[pygame.K_SPACE]:
@@ -164,7 +195,7 @@ while running:
         else:
             soul_anim_count += 1
         if keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]:
-            backg_x -= 2
+            backg_x -= backg_speed
 
         if backg_x == -600:
            backg_x = 0
@@ -174,8 +205,9 @@ while running:
                 screen.blit(bullet, (el.x, el.y))
                 el.x += bullet_speed
 
-                if el.x > 630:
+                if (el.x > 630):
                     bullets.pop(i)
+                    player_stars -= 1
 
 
                 if soul_list_in_game:
@@ -183,6 +215,7 @@ while running:
                         if el.colliderect(soul_el):
                             soul_list_in_game.pop(index)
                             bullets.pop(i)
+                            player_stars -= 1
 
 
     else:
@@ -197,6 +230,10 @@ while running:
             soul_list_in_game.clear()
             bullets.clear()
             bullets_left = 5
+            player_lives = 3
+            player_stars = 5
+    draw_lives()
+    draw_stars()
 
     pygame.display.update()
 
